@@ -110,6 +110,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
         ref={ref}
         type='button'
         role='combobox'
+        aria-controls='dropdown-id'
         aria-expanded={context?.open}
         aria-haspopup='listbox'
         data-state={context?.open ? "open" : "closed"}
