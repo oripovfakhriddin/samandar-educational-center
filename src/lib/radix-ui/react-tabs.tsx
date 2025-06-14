@@ -56,7 +56,9 @@ const Root = React.forwardRef<HTMLDivElement, TabsRootProps>(
       if (!isControlled) {
         setInternalValue(newValue);
       }
-      onValueChange?.(newValue);
+      if (onValueChange) {
+        onValueChange(newValue);
+      }
     };
 
     return (
@@ -98,7 +100,9 @@ const Trigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
 
     const handleClick = () => {
       if (disabled) return;
-      context?.onValueChange(value);
+      if (context?.onValueChange) {
+        context.onValueChange(value);
+      }
     };
 
     return (
@@ -106,6 +110,7 @@ const Trigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
         ref={ref}
         type='button'
         role='tab'
+        id={`trigger-${value}`}
         aria-selected={isSelected}
         aria-controls={`content-${value}`}
         data-state={isSelected ? "active" : "inactive"}
@@ -141,9 +146,11 @@ const Content = React.forwardRef<HTMLDivElement, TabsContentProps>(
   }
 );
 
+// Display name'lar
 Root.displayName = "TabsRoot";
 List.displayName = "TabsList";
 Trigger.displayName = "TabsTrigger";
 Content.displayName = "TabsContent";
 
+// Eksport
 export { Root, List, Trigger, Content };
