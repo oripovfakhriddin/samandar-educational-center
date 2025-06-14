@@ -51,7 +51,7 @@ interface SelectViewportProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
 }
 
-const Root = ({
+const Root: React.FC<SelectRootProps> = ({
   children,
   value,
   defaultValue,
@@ -59,7 +59,7 @@ const Root = ({
   open,
   defaultOpen,
   onOpenChange,
-}: SelectRootProps) => {
+}) => {
   const [internalValue, setInternalValue] = React.useState(defaultValue || "");
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen || false);
 
@@ -70,17 +70,13 @@ const Root = ({
   const currentOpen = isControlledOpen ? open : internalOpen;
 
   const handleValueChange = (newValue: string) => {
-    if (!isControlledValue) {
-      setInternalValue(newValue);
-    }
+    if (!isControlledValue) setInternalValue(newValue);
     onValueChange?.(newValue);
     handleOpenChange(false);
   };
 
   const handleOpenChange = (newOpen: boolean) => {
-    if (!isControlledOpen) {
-      setInternalOpen(newOpen);
-    }
+    if (!isControlledOpen) setInternalOpen(newOpen);
     onOpenChange?.(newOpen);
   };
 
@@ -97,13 +93,12 @@ const Root = ({
   );
 };
 
+Root.displayName = "SelectRoot";
+
 const Trigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
   ({ children, ...props }, ref) => {
     const context = React.useContext(SelectContext);
-
-    const handleClick = () => {
-      context?.onOpenChange(!context.open);
-    };
+    const handleClick = () => context?.onOpenChange?.(!context.open);
 
     return (
       <button
@@ -121,11 +116,11 @@ const Trigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
     );
   }
 );
+Trigger.displayName = "SelectTrigger";
 
 const Value = React.forwardRef<HTMLSpanElement, SelectValueProps>(
   ({ placeholder, ...props }, ref) => {
     const context = React.useContext(SelectContext);
-
     return (
       <span ref={ref} {...props}>
         {context?.value || placeholder}
@@ -133,10 +128,7 @@ const Value = React.forwardRef<HTMLSpanElement, SelectValueProps>(
     );
   }
 );
-
-const Portal = ({ children }: SelectPortalProps) => {
-  return <>{children}</>;
-};
+Value.displayName = "SelectValue";
 
 const Content = React.forwardRef<HTMLDivElement, SelectContentProps>(
   ({ children, position = "popper", ...props }, ref) => {
@@ -144,35 +136,27 @@ const Content = React.forwardRef<HTMLDivElement, SelectContentProps>(
 
     if (!context?.open) return null;
 
+    const positionClass = position === "popper" ? "absolute z-50" : "relative";
+
     return (
       <div
         ref={ref}
         role='listbox'
         data-state={context.open ? "open" : "closed"}
+        className={`${positionClass} ${props.className || ""}`}
         {...props}>
         {children}
       </div>
     );
   }
 );
-
-const Viewport = React.forwardRef<HTMLDivElement, SelectViewportProps>(
-  ({ children, ...props }, ref) => {
-    return (
-      <div ref={ref} {...props}>
-        {children}
-      </div>
-    );
-  }
-);
+Content.displayName = "SelectContent";
 
 const Item = React.forwardRef<HTMLDivElement, SelectItemProps>(
   ({ value, disabled, children, ...props }, ref) => {
     const context = React.useContext(SelectContext);
-
     const handleClick = () => {
-      if (disabled) return;
-      context?.onValueChange(value);
+      if (!disabled) context?.onValueChange?.(value);
     };
 
     const isSelected = context?.value === value;
@@ -191,98 +175,94 @@ const Item = React.forwardRef<HTMLDivElement, SelectItemProps>(
     );
   }
 );
+Item.displayName = "SelectItem";
+
+const Portal: React.FC<SelectPortalProps> = ({ children }) => <>{children}</>;
+
+const Viewport = React.forwardRef<HTMLDivElement, SelectViewportProps>(
+  ({ children, ...props }, ref) => (
+    <div ref={ref} {...props}>
+      {children}
+    </div>
+  )
+);
+Viewport.displayName = "SelectViewport";
 
 const ItemText = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement>
->(({ children, ...props }, ref) => {
-  return (
-    <span ref={ref} {...props}>
-      {children}
-    </span>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <span ref={ref} {...props}>
+    {children}
+  </span>
+));
+ItemText.displayName = "SelectItemText";
 
 const ItemIndicator = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement>
->(({ children, ...props }, ref) => {
-  return (
-    <span ref={ref} {...props}>
-      {children}
-    </span>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <span ref={ref} {...props}>
+    {children}
+  </span>
+));
+ItemIndicator.displayName = "SelectItemIndicator";
 
 const Icon = React.forwardRef<
   HTMLSpanElement,
   React.HTMLAttributes<HTMLSpanElement>
->(({ children, ...props }, ref) => {
-  return (
-    <span ref={ref} {...props}>
-      {children}
-    </span>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <span ref={ref} {...props}>
+    {children}
+  </span>
+));
+Icon.displayName = "SelectIcon";
 
 const ScrollUpButton = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => {
-  return (
-    <div ref={ref} {...props}>
-      {children}
-    </div>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <div ref={ref} {...props}>
+    {children}
+  </div>
+));
+ScrollUpButton.displayName = "SelectScrollUpButton";
 
 const ScrollDownButton = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => {
-  return (
-    <div ref={ref} {...props}>
-      {children}
-    </div>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <div ref={ref} {...props}>
+    {children}
+  </div>
+));
+ScrollDownButton.displayName = "SelectScrollDownButton";
 
 const Group = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => {
-  return (
-    <div ref={ref} role='group' {...props}>
-      {children}
-    </div>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <div ref={ref} role='group' {...props}>
+    {children}
+  </div>
+));
+Group.displayName = "SelectGroup";
 
 const Label = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => {
-  return (
-    <div ref={ref} {...props}>
-      {children}
-    </div>
-  );
-});
+>(({ children, ...props }, ref) => (
+  <div ref={ref} {...props}>
+    {children}
+  </div>
+));
+Label.displayName = "SelectLabel";
 
 const Separator = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
->((props, ref) => {
-  return <div ref={ref} role='separator' {...props} />;
-});
-
-Root.displayName = "SelectRoot";
-Trigger.displayName = "SelectTrigger";
-Value.displayName = "SelectValue";
-Content.displayName = "SelectContent";
-Item.displayName = "SelectItem";
-ItemText.displayName = "SelectItemText";
-ItemIndicator.displayName = "SelectItemIndicator";
+>((props, ref) => <div ref={ref} role='separator' {...props} />);
+Separator.displayName = "SelectSeparator";
 
 export {
   Root,
